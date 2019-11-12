@@ -40,14 +40,51 @@ def GetPopularMovies():
 	popular_movies_df = pd.DataFrame(Movies)
 	return popular_movies_df
 
-# def GetPopularTVShows(apikey):
-# 	#
+def GetPopularTVShows():
+	import json 
+	import pandas as pd 
+	import requests
+	from pprint import pprint
+	import time
+
+	show_url = 'https://api.themoviedb.org/3/tv/popular?api_key=6740709218b69a4e877ef5015c2bcd5d&language=en-US&page='
+
+	url = show_url + '1'
+	response = requests.get(url).json()
+	pages = response['total_pages']
+
+	results = []
+	n = 0
+	droppedcount = []
+
+	for p in range(pages):
+	    p+=1
+	    url = show_url + str(p)
+	    if n == 39:
+	        time.sleep(3)
+	        n = 0
+	    response = requests.get(url).json()
+	    try:
+	        results.append(response['results'])
+	    except KeyError:
+	        droppedcount.append(response)
+
+	Shows = []
+	for result in results:
+	    for show in result:
+	        try:
+	            Shows.append(show)
+	        except:
+	            pass
+
+	popular_shows_df = pd.DataFrame(Shows)
+	return popular_shows_df
 
 def GetCharacters(apikey, movie):
 	#
 	from bs4 import BeautifulSoup
 	import requests
-	
+
 	url = f'http://www.omdbapi.com/?apikey={apikey}&t={movie}'
 	response = requests.get(url).json()
 	try:
